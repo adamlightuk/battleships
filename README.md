@@ -1,6 +1,6 @@
 # battleships
 
-<B>Marking criteria for the implementation of the Battleship game<B>
+<B>Marking criteria for the implementation of the Battleship game</B>
 
 Achieving a mark of 40% to maximum of 49%
 The game must implement all the following:
