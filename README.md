@@ -2,8 +2,8 @@
 
 <B>Marking criteria for the implementation of the Battleship game</B>
 
-Achieving a mark of 40% to maximum of 49%
-The game must implement all the following:
+<B>Achieving a mark of 40% to maximum of 49%
+The game must implement all the following:</B>
 
   • Two players have two grids.
   
@@ -20,8 +20,8 @@ The game must implement all the following:
 
   • Computer player plays randomly.
 
-Achieving a mark of 50% to maximum of 59%
-The game must implement all the above and the following:
+<B>Achieving a mark of 50% to maximum of 59%
+The game must implement all the above and the following:</B>
 
   • Development of Basic Graphical User Interface (GUI) using Python Tkinter.
 
@@ -32,8 +32,8 @@ The game must implement all the above and the following:
   • Computer player should allow some time before it target opponent’s grid. 2 seconds,
   emulating its thinking period even if the next move is random.
 
-Achieving a mark of 60% to maximum of 69%
-The game must implement all the above and the following:
+<B>Achieving a mark of 60% to maximum of 69%
+The game must implement all the above and the following:</B>
 
   • Players can select the size of the grid at the beginning of the game.
 
@@ -44,8 +44,8 @@ The game must implement all the above and the following:
 
   • The game can be saved and loaded into and from a text file.
 
-Achieving a mark of 70% to maximum of 79%
-The game must implement all the above and the following:
+<B>Achieving a mark of 70% to maximum of 79%
+The game must implement all the above and the following:</B>
 
   • Computer player uses random moves, but when there is a hit, it should continue hitting the
   ship by hitting adjacent grids laid horizontally or vertically on the grid.
@@ -53,8 +53,8 @@ The game must implement all the above and the following:
   • Computer player should consider the type of ship and its size when implement the above
   functionalities.
 
-Achieving a mark of 80% and over
-The game must implement all the above and the following:
+<B>Achieving a mark of 80% and over
+The game must implement all the above and the following:</B>
 
   • Computer player should exhibit some intelligence. For example, learning from its previous
   moves when targeting new grids.
