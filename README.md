@@ -6,10 +6,10 @@ Achieving a mark of 40% to maximum of 49%
 The game must implement all the following:
 
   • Two players have two grids.
-
+  
   • Each player can secretly position the ships on its primary grid
 
-  • Each ship can position 5 types of ships either horizontally or vertically on the grid
+   • Each ship can position 5 types of ships either horizontally or vertically on the grid
 
   • Players take turns to target opponent's grid. If hit the grid changes its colour to red,
   otherwise it turns to white for miss.
