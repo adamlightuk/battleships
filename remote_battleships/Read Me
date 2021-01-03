@@ -1,2 +1,6 @@
+These packages are required. Install them using the lines below:
 pip install cryptography
 pip install pillow
+
+
+You will also need to change the path variable in line 202 to the folder ICONS which can be downloaded from this page
