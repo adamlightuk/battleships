@@ -1,5 +1,14 @@
 # battleships
 
+To play, you need cryptography and pillow packages.
+Run the following in a terminal
+
+pip install cryptography
+pip install pillow
+
+Line 305 has a path to the icon folder found on this github
+Download the icon folder and copy the file path to line 305 in place of the current path.
+Python needs slashes to be forward slashes(/) not backslashes(\). You may need to change this manually.
 <B>Marking criteria for the implementation of the Battleship game</B>
 
 <B>Achieving a mark of 40% to maximum of 49%
