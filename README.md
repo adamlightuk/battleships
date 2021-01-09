@@ -1,6 +1,6 @@
 # battleships
 
-To play, you need cryptography and pillow packages.
+To play, you need cryptography and pillow packages. As well as Python insalled
 Run the following in a terminal
 
 pip install cryptography
