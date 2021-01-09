@@ -1,6 +1,7 @@
 #gui module
 #from tkinter import *
-from tkinter import Menu, ttk, Frame,Tk, StringVar, N,E,S,W, PhotoImage,Label
+from os import replace
+from tkinter import  Menu, ttk, Frame,Tk, StringVar, N,E,S,W, PhotoImage
 from tkinter import messagebox
 from tkinter import filedialog
 from typing import Sequence 
@@ -10,6 +11,7 @@ import tkinter
 import sys
 import random
 import copy
+import time
 #crypto
 #
 try:
@@ -20,7 +22,7 @@ try:
 except:
     print("Crypography Package required. To install, use ' pip install cryptography '")
 import base64
-import os
+
 
 
 #file saving
@@ -36,12 +38,15 @@ except:
 import string 
 
 class Grid():
+    def __init__(self):
+        Grid.computerCoordinates = []
     def make_grid(self,size): #makes 2D list for the size given by the user when the game is started
         self.newGrid = [['0' for i in range(size)]for j in range(size)]
         Grid.playerGrid = self.newGrid
         self.oNewGrid= [['0' for i in range(size)]for j in range(size)]
         Grid.oponentGrid = self.oNewGrid
-        #return (self.newGrid)              
+        #return (self.newGrid)
+        print("New grid")              
                 
     def get_letters(self,a):
         self.letters = string.ascii_uppercase #stores the letters of the alphabet in uppercase 
@@ -51,6 +56,8 @@ class Grid():
 
     def get_count_boat_oponent_Grid(self,length):
         return sum(row.count(length) for row in Grid.oponentGrid)
+        
+    #tidy up by making fire inherit its variables from a player object
 
     def playerFire(self,i,j):
         print("You have fired at ", i , j )
@@ -79,13 +86,48 @@ class Grid():
             MenuGUI.changeOponentSquareIcon(self)
             MenuGUI.disableAllOponentButtons(self)
             MenuGUI.changePlayerSquareIcon(self)
+            if MenuGUI.mode == 2:
+                pass
+            elif MenuGUI.mode == 1:
+                MenuGUI.disableAllPlayerButtons(self)
+                #second = random.randint(1,2)
+                #time.sleep(second)
+                self.computer_fire()
+            
         MenuGUI.hintText3.set(f"{MenuGUI.playerHit} Hits {MenuGUI.playerSunk} Sinks {MenuGUI.playerMiss} Misses")
         if MenuGUI.playerSunk == 5:
             MenuGUI.disableAllOponentButtons(self)
             MenuGUI.disableAllPlayerButtons(self)
             messagebox.showinfo('You WON',"Congratualations you won!")
         
+
+    def computer_fire(self):
+        repeat = True
+        while repeat == True:
+            ir = random.randint(0,MenuGUI.getSize(self)-1)
+            jr = random.randint(0,MenuGUI.getSize(self)-1)
+            
+    
+            if ([ir,jr]in Grid.computerCoordinates):
+                print(f"Duplicate {ir},{jr}")
+                    
+            else: 
+                print(f"Non duplicate {ir},{jr}")
+                Grid.computerCoordinates.append([ir,jr])
+                
+                print(Grid.computerCoordinates)
+                print(f"Computer fired at {ir},{jr}")
+                self.oponentFire(ir,jr)
+                repeat = False
+                break
+                
+                
+                
         
+        
+        
+
+        return    
 
     def oponentFire(self,i,j):
         print("Oponent fired at ", i , j )
@@ -109,29 +151,26 @@ class Grid():
 
             MenuGUI.changePlayerSquareIcon(self)
             MenuGUI.disableAllOponentButtons(self)
+            if MenuGUI.mode == 1:
+                MenuGUI.disableAllPlayerButtons(self)
+                self.computer_fire()
 
             
         elif Grid.playerGrid[i][j]== '0':
             print("It's a miss")
             MenuGUI.hintText5.set(f"Opponent missed")
             Grid.playerGrid[i][j] = 'M'
+            MenuGUI.changeOponentSquareIcon(self)
             MenuGUI.changePlayerSquareIcon(self)
             MenuGUI.disableAllPlayerButtons(self)
-            MenuGUI.changeOponentSquareIcon(self)
+            
             MenuGUI.oponentMiss +=1
         MenuGUI.hintText6.set(f"{MenuGUI.oponentHit} Hits {MenuGUI.oponentSunk} Sinks {MenuGUI.oponentMiss} Misses")
         if MenuGUI.oponentSunk == 5:
             MenuGUI.disableAllOponentButtons(self)
             MenuGUI.disableAllPlayerButtons(self)
             messagebox.showinfo('You LOST',"Oh dear! Your Oponent beat you!")
-            
-        
-
-
-        
-
-
-
+              
 
 class Ships(Grid):
     
@@ -166,20 +205,23 @@ class Ships(Grid):
                     MenuGUI.shipSize = MenuGUI.shipSize+1
                     break
                     
-            MenuGUI.shipSize = MenuGUI.shipSize-1       
+            MenuGUI.shipSize = MenuGUI.shipSize-1      
             MenuGUI.changePlayerSquareIcon(self)
             MenuGUI.disableBoatSquares(self)
             self.shipCount =(MenuGUI.getSize(self)*MenuGUI.getSize(self))-sum(row.count('0') for row in Grid.playerGrid)
             print("Square ( %i,%i ) = "%(i,j)   , Grid.playerGrid[i][j] , ". Ship count: " , self.shipCount)
             print(self.tempShip)
             if self.shipCount >=15:
+                MenuGUI.firing = 1
                 MenuGUI.disableAllPlayerButtons(self)
-                
-                MenuGUI.fileSaveButton.configure(state='enable')
-                
-                MenuGUI.hintText1.set("Thank You. Please now select save game config")
-                MenuGUI.hintText2.set("Swap files with your oponent by sending the config file produced.")
-                MenuGUI.hintText3.set("Then open your oponent's file")
+                if MenuGUI.mode == 2:
+                    MenuGUI.fileSaveButton.configure(state='enable')            
+                    MenuGUI.hintText1.set("Thank You. Please now select save game config")
+                    MenuGUI.hintText2.set("Swap files with your oponent by sending the config file produced.")
+                    MenuGUI.hintText3.set("Then open your oponent's file")
+                elif MenuGUI.mode == 1:
+                    
+                    MenuGUI.enableAllOponentButtons(self)
             else:
                 MenuGUI.hintText1.set("Now select where your battleship of length %i is placed" % MenuGUI.shipSize)
             print(Grid.playerGrid)
@@ -190,28 +232,111 @@ class Ships(Grid):
                 messagebox.showerror("Outside of Range","You have entered a square outside the grid, please enter again")
                 Grid.playerGrid = copy.deepcopy(self.tempPlayerGrid)
                 
+
+    def randomStartingPoints(self):
+        #starting places
+        i = []
+        j = []
+        
+        n = 0
+        while n < 5:
+            MenuGUI.shipSize = n+1
+            ia = random.randint(0,MenuGUI.getSize(self)-1)
+            ja = random.randint(0,MenuGUI.getSize(self)-1)
+            if (ia in i) and (ja in j):
+                print("Duplicate")
                 
-    def computer_place_ships(self):
-        while True:
-            try:
-
-                for n in range(5):
-                    i = random.randint(0,(MenuGUI.getSize(self)))
-                    j = random.randint(0,MenuGUI.getSize(self))
-                    for m in range(n):
-                        Grid.oponentGrid[i+n][j] = 'B'+ str(MenuGUI.shipSize)
-                        
-                break
-            except:
-                messagebox.showerror("Outside of Range","You have entered a square outside the grid, please enter again")
+            else:
                 
-                break
+                i.append(ia)
+                j.append(ja)
+
+                #Grid.oponentGrid[i[n]][j[n]] = 'B'+ str(MenuGUI.shipSize)
+                n +=1
+        return [i,j]
+    
+    def is_ship_length_n_possible(self,i,j,length):
+        x = []
+        y = []
+        for q in range (length):
+            x.append(i + q)
+            y.append(j)
+            if x[q] > MenuGUI.getSize(self)-1:
+                return False
+            else:
+                continue
+    def do_ships_overlap(self,i,j,length):
+        x = []
+        y = []
+        for q in range(length):
+            x.append(i+q)
+            y.append(j)
+            if x[q] in self.boardShipsj and y[q] in self.boardShipsj:
+                print("Extended boats overlap")
+                return False
+            else:
+                continue
 
 
 
+    def ship_lengths(self,i,j,length):
+        x = []
+        y = []
+        for q in range (length):
+            x.append(i + q)
+            y.append(j)
+            
+        return [x,y]
             
 
-                    
+        
+
+
+    def computer_place_ships(self):
+        self.boardShipsi = []
+        self.boardShipsj = []
+        point = self.randomStartingPoints()
+        #returns list with coordinates of boat starting places
+
+
+        #one iteration for each boat
+        for n in range (5):
+            a = n + 1
+            i = point[0][n]
+            j = point[1][n]
+            if self.is_ship_length_n_possible(i,j,a) == False or self.do_ships_overlap(i,j,a) == False:
+                print("Not Possible")
+                print()
+                Grid.make_grid(self,(MenuGUI.getSize(self)))
+                
+                self.computer_place_ships()
+                break
+
+            else:
+
+                shipBodies = self.ship_lengths(i,j,a)
+                for m in range(a):
+                    x = shipBodies[0][m]
+                    y = shipBodies[1][m]
+                    Grid.oponentGrid[x][y] = 'B'+ str(a)
+                    self.boardShipsi.append(x)
+                    self.boardShipsj.append(y)
+
+                
+            
+        if sum(row.count('0') for row in Grid.oponentGrid) > ((MenuGUI.getSize(self)*MenuGUI.getSize(self))-15) :
+            print("Not Possible due to not 15 elements")
+            count =(MenuGUI.getSize(self)*MenuGUI.getSize(self)-sum(row.count('0') for row in Grid.oponentGrid))
+            print(f"There are {count} boat squares so not possible")
+            print()
+            Grid.make_grid(self,(MenuGUI.getSize(self))) 
+            self.computer_place_ships()
+        else:
+            pass
+            
+            
+
+                
     def rotate90(self):
         #this will attempt to rotate the boat 90 degrees anticlockwise. If that's not possible, it will attempt to
         #rotate 90 degrees clockwise. If that's not possible ,it will prompt the user to select again
@@ -233,7 +358,7 @@ class Ships(Grid):
                     x=xB
                     y=yB
                     if Grid.playerGrid[x][y] == '0':
-                        Grid.playerGrid[x][y]='B'+str(MenuGUI.shipSize)
+                        Grid.playerGrid[x][y]='B'+str(MenuGUI.shipSize+1)
                     else:
                         messagebox.showerror("Overlap","You have entered a square that will result in a ship overlap. Please enter again")
                         Grid.playerGrid = copy.deepcopy(self.tempPlayerGrid)
@@ -262,7 +387,7 @@ class Ships(Grid):
                         x=xB
                         y=yB
                         if Grid.playerGrid[x][y] == '0':
-                            Grid.playerGrid[x][y]='B'+str(MenuGUI.shipSize)
+                            Grid.playerGrid[x][y]='B'+str(MenuGUI.shipSize+1)
                         else:
                             messagebox.showerror("Overlap","You have entered a square that will result in a ship overlap. Please enter again")
                             Grid.playerGrid = copy.deepcopy(self.tempPlayerGrid)
@@ -287,6 +412,9 @@ class Ships(Grid):
 class MenuGUI(Frame,Ships,Grid):
     def __init__(self,root): 
         
+        MenuGUI.mode = 0
+        MenuGUI.firing = 0
+
         root.title("Battleships")#sets the title of the window
         
 
@@ -378,7 +506,7 @@ class MenuGUI(Frame,Ships,Grid):
         ttk.Label(self.mainMenuFrame, text= "New Game:").grid(row=6,column=1,sticky=(W,E))
 
         #1 player  button ##add command##
-        ttk.Button(self.mainMenuFrame,text="1 Player",state='disabled').grid(row=6,column=2,sticky=(W,E))        
+        ttk.Button(self.mainMenuFrame,text="1 Player",command=self.onePlayerBtn).grid(row=6,column=2,sticky=(W,E))        
 
         #2player  button 
         ttk.Button(self.mainMenuFrame,text="2 Player",command=self.twoPlayerBtn).grid(row=6,column=3,sticky=(W,E))
@@ -432,10 +560,10 @@ class MenuGUI(Frame,Ships,Grid):
                 #text=str(i)+','+str(j)
 
         #place ships buttons size
-        self.shipSizeButtons = [] 
-        for i in range (5):
-            self.shipSizeButtons.append(ttk.Button(self.placeshipsFrame,text=str(i+1),width=3,state='disabled'))
-            self.shipSizeButtons[i].grid(column=i,row=0)
+        #self.shipSizeButtons = [] 
+        #for i in range (5):
+         #   self.shipSizeButtons.append(ttk.Button(self.placeshipsFrame,text=str(i+1),width=3,state='disabled'))
+         #   self.shipSizeButtons[i].grid(column=i,row=0)
         
 
         
@@ -503,7 +631,18 @@ class MenuGUI(Frame,Ships,Grid):
     
     def twoPlayerBtn(self):
         self.updateGUI()
-        
+        #reset game stats
+        MenuGUI.mode = 2
+        MenuGUI.playerSunkList = []
+        MenuGUI.oponentSunkList = []
+
+        MenuGUI.playerMiss = 0
+        MenuGUI.playerHit = 0
+        MenuGUI.playerSunk = 0
+
+        MenuGUI.oponentMiss = 0
+        MenuGUI.oponentHit = 0
+        MenuGUI.oponentSunk = 0 
         Grid.make_grid(self,self.size)
 
         MenuGUI.hintText1.set("Now select where your battleship of length %i is placed" % MenuGUI.shipSize)
@@ -514,6 +653,40 @@ class MenuGUI(Frame,Ships,Grid):
 
         #disable menu buttons 
         #add save to file button
+
+    def onePlayerBtn(self):
+        self.updateGUI()
+        #reset game stats
+        MenuGUI.mode = 1
+        MenuGUI.playerSunkList = []
+        MenuGUI.oponentSunkList = []
+
+        MenuGUI.playerMiss = 0
+        MenuGUI.playerHit = 0
+        MenuGUI.playerSunk = 0
+
+        MenuGUI.oponentMiss = 0
+        MenuGUI.oponentHit = 0
+        MenuGUI.oponentSunk = 0 
+        Grid.make_grid(self,self.size)
+        Ships.computer_place_ships(self)
+        Grid.computerCoordinates = []
+        count =(MenuGUI.getSize(self)*MenuGUI.getSize(self)-sum(row.count('0') for row in Grid.oponentGrid))
+        print(f"There are {count} boat squares")
+        MenuGUI.hintText1.set("Now select where your battleship of length %i is placed" % MenuGUI.shipSize)
+        MenuGUI.hintText2.set("To load a file, select load Game from file")
+        MenuGUI.hintText3.set("The computer successfully placed")
+            
+
+        #temp view
+        # for x in range(self.size):
+        #     for y in range (self.size):
+        #         if 'B' in Grid.oponentGrid[x][y]:
+        #             self.oponentGridButtons[x][y].configure(image=self.smallHitImg,state='enabled')
+        #         elif 'M' in Grid.oponentGrid[x][y]:
+        #             self.oponentGridButtons[x][y].configure(image=self.smallMissImg,state='enabled')
+        
+        return
 
 
     def disableBoatSquares(self):
@@ -526,6 +699,7 @@ class MenuGUI(Frame,Ships,Grid):
         #ttk buttons cannot hold colours
         #ttk button image
         #MenuGUI.playerGridButtons[i+1][j+1].config()
+        
         for x in range (self.size):
             for y in range (self.size):
                 if Grid.playerGrid[x][y] == '0':
